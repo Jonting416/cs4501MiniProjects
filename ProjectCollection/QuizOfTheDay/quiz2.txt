@@ -1,0 +1,4 @@
+In FFXIV, the skill Swiftcast is from which class?#Conjurer:Thaumaturge:Arcanist#2
+In FFXIV, which tank uses a greatsword?#Dark Knight:Paladin:Warrior#1
+In FFXIV, which DPS job has the skill Geirskogul?#Monk:Black Mage:Summoner:Dragoon:Ninja:Bard:Machinist#4
+In FFXIV, the White Mage has the skill Benediction.  It:#Shields everybody:Instantly Revives people:Heals for 100% HP#3

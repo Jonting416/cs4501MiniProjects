@@ -1,0 +1,29 @@
+Name:Jonathan Ting Assignment #: 4
+
+Recitation Day and Time: December 5, 2016
+
+TA: Kavita
+
+Program Due Date: 12/1/2016
+
+Handed in Date: 12/1/2016 
+
+Source code file name(s):
+
+getWord.php, hangman.html, index.html, init.php, style.css, test.php
+
+Other file name(s) (if relevant): words.txt, hangman0.jpg,
+
+hangman1.jpg, hangman2.jpg, hangman3.jpg, hangman4.jpg, 
+
+hangman5.jpg, hangman6.jpg, hangman7.jpg
+
+Does your program run without error?: Yes 
+
+If not, what is/are the error(s) and which parts of your program run correctly?:
+
+________________________________________________________________
+
+Additional comments (including problems and extra credit):
+
+None!

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>AJAXSupport</title>
+	<style>
+	.frmbtn {
+		width:250px;
+	}
+	</style>
+	<script type="text/javascript">
+		var httpRequest;
+		var output;
+		var fullTable;
+		var table;
+		var form;
+
+		function getTable() {
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+
+			httpRequest.open('GET', 'ticketGet.php', true);
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				fullTable = JSON.parse(this.responseText);
+				table = fullTable;
+				makeTable(table);
+			};
+			httpRequest.send();
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+
+			httpRequest.open('GET', 'getUsername.php', true);
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				username = this.responseText;
+			};
+			httpRequest.send();
+		}
+
+		function makeTable(displayData) {
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+
+			var json = JSON.stringify(displayData);
+			httpRequest.open('POST', 'makeTable.php', true);
+			httpRequest.setRequestHeader("Content-type", "application/json");
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				document.getElementById("mainBody").innerHTML = this.responseText;
+				form = document.getElementById('sorting');
+				if(form.attachEvent) {
+					form.attachEvent("submit", sortArray);
+				} else {
+					form.addEventListener("submit", sortArray);
+				}
+				form = document.getElementById('buttons');
+				if(form.attachEvent) {
+					form.attachEvent("submit", detailView);
+				} else {
+					form.addEventListener("submit", detailView);
+				}
+			};
+			httpRequest.send(json);
+		}
+
+		function sortArray(e) {
+			if(e.preventDefault) e.preventDefault();
+			var sortBy = document.querySelector('input[name = "pick"]:checked').value;
+			var sorted = table;
+			if(sortBy == "id") {
+				sorted = table.sort(function(a,b){return a["id"] - b["id"];});
+			}
+			if(sortBy == "fname") {
+				sorted = table.sort(function(a,b){return (a["fname"] < b["fname"]) ? -1 : (a["fname"] > b["fname"]) ? 1 : 0;});
+			}
+			if(sortBy == "lname") {
+				sorted = table.sort(function(a,b){return (a["lname"] < b["lname"]) ? -1 : (a["lname"] > b["lname"]) ? 1 : 0;});
+			}
+			if(sortBy == "email") {
+				sorted = table.sort(function(a,b){return (a["email"] < b["email"]) ? -1 : (a["email"] > b["email"]) ? 1 : 0;});
+			}
+			if(sortBy == "subject") {
+				sorted = table.sort(function(a,b){return (a["subject"] < b["subject"]) ? -1 : (a["subject"] > b["subject"]) ? 1 : 0;});
+			}
+			if(sortBy == "timeReceived") {
+				sorted = table.sort(function(a,b){return (a["timeReceived"] < b["timeReceived"]) ? -1 : (a["timeReceived"] > b["timeReceived"]) ? 1 : 0;});
+			}
+			if(sortBy == "admin") {
+				sorted = table.sort(function(a,b){return (a["admin"] < b["admin"]) ? -1 : (a["admin"] > b["admin"]) ? 1 : 0;});
+			}
+			if(sortBy == "open") {
+				sorted = table.sort(function(a,b){return (a["open"] < b["open"]) ? -1 : (a["open"] > b["open"]) ? 1 : 0;});
+			}
+			makeTable(sorted);
+			return false;
+		}
+
+		function detailView(e) {
+			if(e.preventDefault) e.preventDefault();
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+
+			var number = document.querySelector('input[name = "pick"]:checked').value;
+			output = number;
+			var vars = "pick="+number;
+			httpRequest.open('POST', 'detailView.php', true);
+			httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				document.getElementById("mainBody").innerHTML = this.responseText;
+				form = document.getElementById("selectButtons");
+				if(form.attachEvent) {
+					form.attachEvent("submit", detailView2);
+				} else {
+					form.addEventListener("submit", detailView2);
+				}
+			}
+			httpRequest.send(vars);
+		}
+
+		function detailView2(e) {
+			if(e.preventDefault) e.preventDefault();
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+
+			var action = e.explicitOriginalTarget.value;
+			var vars = "action="+action+"&pick="+output;
+			httpRequest.open('POST', 'detailView.php', true);
+			httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				document.getElementById("mainBody").innerHTML = this.responseText;
+				form = document.getElementById('selectButtons');
+				if(form.attachEvent) {
+					form.attachEvent("submit", detailView2);
+				} else {
+					form.addEventListener("submit", detailView2);
+				}
+			}
+			httpRequest.send(vars);
+		}
+
+		function viewTickets() {
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+
+			httpRequest.open('GET', 'viewSame.php', true);
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				document.getElementById("mainBody").innerHTML = this.responseText;
+			};
+			httpRequest.send();
+		}
+
+		function sendMail() {
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+
+			httpRequest.open('GET', 'mail.php', true);
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				document.getElementById("mainBody").innerHTML = this.responseText;
+				form = document.getElementById('mailing');
+				if(form.attachEvent) {
+					form.attachEvent("submit", callMailFunction);
+				} else {
+					form.addEventListener("submit", callMailFunction);
+				}
+			};
+			httpRequest.send();
+		}
+
+		function viewSimilar() {
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+
+			httpRequest.open('GET', 'viewSimilar.php', true);
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				tempTable = JSON.parse(this.responseText);
+				makeTable(tempTable);
+			};
+			httpRequest.send();
+		}
+
+		function callMailFunction(e) {
+			if(e.preventDefault) e.preventDefault();
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+
+			var receiver = document.getElementById("receiver").value;
+			var sender = document.getElementById("sender").value;
+			var subject = document.getElementById("subject").value;
+			var msg = document.getElementById("msg").value;
+			var vars = "receiver="+receiver+"&sender="+sender+"&subject="+subject+"&msg="+msg;
+			httpRequest.open('POST', 'sendmail.php', true);
+			httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				document.getElementById("mainBody").innerHTML = this.responseText;
+			}
+			httpRequest.send(vars);
+		}
+
+		function viewAll() {
+			table = fullTable;
+			makeTable(table);
+			return;
+		}
+
+		function viewMine() {
+			table = [];
+			for(var i = 0; i < fullTable.length; ++i) {
+				if(fullTable[i]["admin"] == username)
+					table.push(fullTable[i]);
+			}
+			makeTable(table);
+			return;
+		}
+
+		function viewOpen() {
+			table = [];
+			for(var i = 0; i < fullTable.length; ++i) {
+				if(fullTable[i]["admin"] == "")
+					table.push(fullTable[i]);
+			}
+			makeTable(table);
+			return;
+		}
+	</script>
+</head>
+<body onload="getTable()">
+	<h1 style="text-align:center;">AJAXSupport Admin Site</h1>
+	<div id="mainBody">
+	</div>
+</body>
+</html>

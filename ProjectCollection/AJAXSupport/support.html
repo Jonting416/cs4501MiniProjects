@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>AJAXSupport</title>
+	<style>
+	.frmbtn {
+		width:250px;
+	}
+	</style>
+	<script type="text/javascript">
+		var httpRequest;
+		var output = "";
+		var root;
+		var form;
+
+		//Display the ticket submission form
+		function ticketForm() {
+			document.getElementById("reset").style.display = 'block';
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+
+			httpRequest.open('GET', 'ticketForm.php', true);
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				document.getElementById("mainBody").innerHTML = this.responseText;
+				form = document.getElementById('ticket_form');
+				if(form.attachEvent) {
+					form.attachEvent("submit", processForm);
+				} else {
+					form.addEventListener("submit", processForm);
+				}
+			};
+			httpRequest.send();
+		}
+
+		function processForm(e) {
+			if(e.preventDefault) e.preventDefault();
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+			
+			var sub = document.getElementById("subject").value;
+			var desc = document.getElementById("description").value;
+			var vars = "subject="+sub+"&description="+desc;
+			httpRequest.open('POST', "insertTicket.php", true);
+			httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			document.getElementById("mainBody").innerHTML = "Working...";
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				document.getElementById("mainBody").innerHTML = this.responseText;
+			}
+			httpRequest.send(vars);
+			return false;
+		}
+
+		function viewTickets() {
+			document.getElementById("reset").style.display = 'block';
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+
+			httpRequest.open('GET', 'viewMine.php', true);
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				document.getElementById("mainBody").innerHTML = this.responseText;
+			};
+			httpRequest.send();
+		}
+
+		function changePassword() {
+			document.getElementById("reset").style.display = 'block';
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+
+			httpRequest.open('GET', 'passChange.php', true);
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				document.getElementById("mainBody").innerHTML = this.responseText;
+				form = document.getElementById('pass_form');
+				if(form.attachEvent) {
+					form.attachEvent("submit", processFormPass);
+				} else {
+					form.addEventListener("submit", processFormPass);
+				}
+			};
+			httpRequest.send();
+		}
+
+		function processFormPass(e) {
+			if(e.preventDefault) e.preventDefault();
+			if(window.XMLHttpRequest) {
+				httpRequest = new XMLHttpRequest();
+				if(httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType('text/html');
+				}
+			} else if (window.ActiveXObject) {
+				try {
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				} catch (e) {}
+			}
+			if(!httpRequest) {
+				alert("Giving up :( Can't make an XMLHTTP instance!");
+				return false;
+			}
+			
+			var newPass = document.getElementById("passwordNew").value;
+			var vars = "passwordNew="+newPass;
+			httpRequest.open('POST', "resetAction.php", true);
+			httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			document.getElementById("mainBody").innerHTML = "Working...";
+			httpRequest.onreadystatechange = function() {
+				if(this.readyState !== 4) return;
+				if(this.status !== 200) return;
+				document.getElementById("mainBody").innerHTML = this.responseText;
+			}
+			httpRequest.send(vars);
+			return false;
+		}
+
+		function reset() {
+			document.getElementById("mainBody").innerHTML = '<h1>Welcome to the support site!</h1>\
+			<button onclick="ticketForm()">Submit a new Ticket</button>\
+			<button onclick="viewTickets()">See all of my tickets</button>\
+			<button onclick="changePassword()">Change Password</button>\
+			<a href="logout.php"><button>Logout</button></a>';
+			document.getElementById("reset").style.display='none';
+		}
+	</script>
+</head>
+<body>
+	<div id="mainBody">
+		<h1>Welcome to the support site!</h1>
+		<button onclick="ticketForm()">Submit a new Ticket</button>
+		<button onclick="viewTickets()">See all of my tickets</button>
+		<button onclick="changePassword()">Change Password</button>
+		<a href="logout.php"><button>Logout</button></a>
+	</div>
+	<div id="reset" style="display: none">
+		<button onclick="reset()">Go back</button>
+	</div>
+</body>
+</html>

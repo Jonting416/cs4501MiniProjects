@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Hangman!</title>
+	<link href="style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		//The script goes here
+		var true_word = [], display_word = [], guessed = [];
+		var wordList, wordCopy, wrong_count, game_count = 0, win_count = 0;
+		var gameOver = false;
+
+		//Initialization - Start game and get words to be used as array in session
+		$(document).ready(function() {
+			$.post("getWord.php", function(data) {
+				wordList = jQuery.parseJSON(data);
+				startGame();
+			});
+			$("#makeGuess").click(function() {
+				letter = $("#guessLetter").val();
+				if(jQuery.inArray(letter, guessed) === -1) {
+					makeGuess(letter);
+				}
+			});
+			$("#newGame").click(function() {
+				var retVal = confirm("Are you sure you want to start over?");
+				if(retVal == true) {
+					startGame();
+				}
+			});
+			$("#guessLetter").focus(function() {
+				$(this).val("");
+			});
+		});
+
+		function startGame() {
+			//Initializing game start state
+			true_word = [];
+			display_word = [];
+			guessed = [];
+			wrong_count = 0;
+			game_count += 1;
+			gameOver = false;
+			var index = parseInt((Math.random()*wordList.length))-1;
+			true_word = wordList[index].split("");
+			wordCopy = wordList[index]; //Keep a copy in case you lose
+			//alert(true_word);
+			for(i = 0; i < true_word.length; i++) {
+				display_word.push("_");
+			}
+			//Initializing display
+			$("#displayWord").text(display_word.join(" "));
+			$("#guessList").text("");
+			$("#displayStats").text("");
+			$("#answer").text("");
+			$("#hangedMan").prop('src', "hangman0.jpg");
+			$("#guessLetter").prop('disabled', false);
+			wordList.splice(index, 1);
+		}
+
+		function makeGuess(letter) {
+			var index = jQuery.inArray(letter, true_word);
+			guessed.push(letter);
+			if(index === -1) {
+				wrong_count += 1;
+				var newPictureName = "hangman" + wrong_count + ".jpg";
+				if(wrong_count >= 7) {
+					newPictureName = "hangman7.jpg";
+					$("#guessLetter").val("");
+					$("#guessLetter").prop('disabled', true);
+					alert("You lose!");
+					$("#answer").text("The answer was: " + wordCopy);
+					displayStats();
+				}
+				$("#hangedMan").prop('src', newPictureName);
+			}
+			while(index !== -1) {
+				display_word[index] = letter;
+				true_word[index] = "_";
+				index = jQuery.inArray(letter, true_word);
+			}
+			if(jQuery.inArray('_', display_word) === -1) {
+				alert("You win!");
+				win_count += 1;
+				displayStats();
+			}
+			$("#displayWord").text(display_word.join(" "));
+			$("#guessList").text(guessed.join(", "));
+		}
+
+		function displayStats() {
+			var percent = parseInt((win_count/game_count)*100);
+			$("#displayStats").text("You have won " + win_count + " out of " + game_count + " games played (" + percent + "%)");
+			gameOver = true;
+		}
+	</script>
+	<h1>Hangman!</h1>
+	<input id="guessLetter" type="text" maxlength="1"/>
+	<button id="makeGuess">Guess</button></br>
+	<div id="displayWord"></div></br>
+	<div id="answer"></div></br>
+	<img id="hangedMan" src="hangman0.jpg"></br>
+	<div id="displayStats"></div></br>
+	You guessed: </br>
+	<div id="guessList"></div>
+	<button id="newGame">New Game?</button>
+</body>
+</html>
